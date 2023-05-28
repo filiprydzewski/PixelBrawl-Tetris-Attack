@@ -12,10 +12,14 @@ public class CameraController : MonoBehaviour
     private bool isMovingCamera;
     private Vector3 initialCameraPosition;
     private Vector3 targetCameraPosition;
+    private Vector3 initialBackgroundPosition;
+    public Transform background;
+
 
     private void Start()
     {
         initialCameraPosition = cameraTransform.position;
+        initialBackgroundPosition = background.position;
     }
 
     private void Update()
@@ -35,6 +39,7 @@ public class CameraController : MonoBehaviour
             MoveTargetElement();
             MoveCameraTrigger();
             MoveTetrisManager();
+            MoveBackground();
         }
     }
 
@@ -95,5 +100,11 @@ public class CameraController : MonoBehaviour
     {
         Vector3 tetrisManagerPosition = tetrisManager.transform.position + Vector3.up * cameraSpeed * Time.deltaTime;
         tetrisManager.transform.position = tetrisManagerPosition;
+    }
+
+    private void MoveBackground()
+    {
+        Vector3 backgroundPosition = initialBackgroundPosition + (cameraTransform.position - initialCameraPosition);
+        background.position = backgroundPosition;
     }
 }
