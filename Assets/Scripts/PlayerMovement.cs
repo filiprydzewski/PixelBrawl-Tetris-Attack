@@ -21,9 +21,6 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private KeyCode moveRightKey = KeyCode.D;
     [SerializeField] private KeyCode jumpKey = KeyCode.Space;
 
-
-
-
     // Start is called before the first frame update
     void Start()
     {
@@ -49,7 +46,52 @@ public class PlayerMovement : MonoBehaviour
             canJump = false;
         }
     }
-    
+
+    //private void OnCollisionEnter2D(Collision2D collision)
+    //{
+    //    if (collision.gameObject.CompareTag("Tetromino") && collision.otherCollider.CompareTag("Player"))
+    //    {
+    //        float playerY = collision.otherCollider.transform.position.y;
+    //        float tetrominoY = collision.gameObject.transform.position.y;
+
+    //        if (playerY < tetrominoY - 0.001f)
+    //        {
+    //            AudioSource[] audioSources = FindObjectsOfType<AudioSource>();
+    //            foreach (AudioSource source in audioSources)
+    //            {
+    //                source.Stop();
+    //            }
+    //            Time.timeScale = 0f;
+    //        }
+    //    }
+    //}
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject.CompareTag("Tetromino") && collision.otherCollider.CompareTag("Player"))
+        {
+            float playerY = collision.otherCollider.transform.position.y;
+            float tetrominoY = collision.gameObject.transform.position.y;
+            float playerX = collision.otherCollider.transform.position.x;
+            float tetrominoX = collision.gameObject.transform.position.x;
+
+            Collider2D playerCollider = collision.otherCollider;
+            Collider2D tetrominoCollider = collision.collider;
+
+            if (playerY < tetrominoY - 0.001f && playerCollider.bounds.Intersects(tetrominoCollider.bounds))
+            {
+                AudioSource[] audioSources = FindObjectsOfType<AudioSource>();
+                foreach (AudioSource source in audioSources)
+                {
+                    source.Stop();
+                }
+                Time.timeScale = 0f;
+            }
+        }
+    }
+
+
+
     private float GetMovementInput()
     {
         if (Input.GetKey(moveLeftKey))
@@ -68,26 +110,25 @@ public class PlayerMovement : MonoBehaviour
 
     private void Move(float direction)
     {
-    rb.velocity = new Vector2(direction * moveSpeed, rb.velocity.y);
+        rb.velocity = new Vector2(direction * moveSpeed, rb.velocity.y);
 
-    // Obliczanie docelowego k¹ta obrotu
-    if (direction > 0)
-    {
-        targetRotation = 180f; // Kierunek w prawo (0 stopni)
+        // Obliczanie docelowego k¹ta obrotu
+        if (direction > 0)
+        {
+            targetRotation = 180f; // Kierunek w prawo (0 stopni)
+        }
+        else if (direction < 0)
+        {
+            targetRotation = 0f; // Kierunek w lewo (180 stopni)
+        }
+
+        // P³ynne obracanie postaci
+        float currentRotation = Mathf.LerpAngle(transform.eulerAngles.y, targetRotation, rotationSpeed * Time.deltaTime);
+        transform.eulerAngles = new Vector3(transform.eulerAngles.x, currentRotation, transform.eulerAngles.z);
     }
-    else if (direction < 0)
+
+    private void Jump()
     {
-        targetRotation = 0f; // Kierunek w lewo (180 stopni)
-    }
-
-    // P³ynne obracanie postaci
-    float currentRotation = Mathf.LerpAngle(transform.eulerAngles.y, targetRotation, rotationSpeed * Time.deltaTime);
-    transform.eulerAngles = new Vector3(transform.eulerAngles.x, currentRotation, transform.eulerAngles.z);
-
-}
-
-
-    private void Jump() {
         // Skakanie
         if (canJump && Input.GetKeyDown(jumpKey))
         {

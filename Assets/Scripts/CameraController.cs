@@ -64,7 +64,7 @@ public class CameraController : MonoBehaviour
             if (collider.CompareTag(tetrominoTag))
             {
                 Rigidbody2D tetrominoRigidbody = collider.GetComponent<Rigidbody2D>();
-                if (tetrominoRigidbody != null && tetrominoRigidbody.velocity.y < 0.000001)
+                if (tetrominoRigidbody != null && tetrominoRigidbody.IsSleeping())
                 {
                     return true;
                 }
