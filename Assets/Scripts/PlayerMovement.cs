@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -5,21 +6,30 @@ using UnityEngine;
 public class PlayerMovement : MonoBehaviour
 {
     private bool onGround;
+    private float maxStamina = 100f;
+    private float currentStamina;
+    private float staminaRegenSpeed = 10f;
+    private bool canDoubleJump = false;
     public LayerMask groundLayer;
     private Collider2D playerCollider;
     private float moveSpeed = 6f;
     private Rigidbody2D rb;
     private SpriteRenderer spriteRenderer;
     private float fallMultiplier = 2f;
-    private float lowJumpMultiplier = 1f;
+    private float lowJumpMultiplier = 5f;
     private bool canJump = true;
-    private float jumpForce = 7f;
+    private float jumpForce = 11f;
     private float rotationSpeed = 10f; // Prêdkoœæ obracania
     private float targetRotation = 0f; // Docelowy k¹t obrotu
+
+    private enum MovementState { idle, walking, jumping, doubleJump };
+    private Animator anim;
+    MovementState state;
 
     [SerializeField] private KeyCode moveLeftKey = KeyCode.A;
     [SerializeField] private KeyCode moveRightKey = KeyCode.D;
     [SerializeField] private KeyCode jumpKey = KeyCode.Space;
+    [SerializeField] private float staminaX;
 
     // Start is called before the first frame update
     void Start()
@@ -27,6 +37,9 @@ public class PlayerMovement : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         playerCollider = GetComponent<Collider2D>();
         spriteRenderer = GetComponent<SpriteRenderer>();
+        anim = GetComponent<Animator>();
+        state = MovementState.idle;
+        currentStamina = maxStamina;
     }
 
     // Update is called once per frame
@@ -35,36 +48,14 @@ public class PlayerMovement : MonoBehaviour
         Move(GetMovementInput());
         Jump();
 
-        // SprawdŸ, czy gracz jest na ziemi
-        onGround = Physics2D.IsTouchingLayers(playerCollider, groundLayer);
-        if (onGround)
+        if (currentStamina < 100f)
         {
-            canJump = true;
+            currentStamina += staminaRegenSpeed * Time.deltaTime;
+            currentStamina = Mathf.Clamp(currentStamina, 0f, 100f);
         }
-        else
-        {
-            canJump = false;
-        }
+
+        anim.SetInteger("state", (int)state);
     }
-
-    //private void OnCollisionEnter2D(Collision2D collision)
-    //{
-    //    if (collision.gameObject.CompareTag("Tetromino") && collision.otherCollider.CompareTag("Player"))
-    //    {
-    //        float playerY = collision.otherCollider.transform.position.y;
-    //        float tetrominoY = collision.gameObject.transform.position.y;
-
-    //        if (playerY < tetrominoY - 0.001f)
-    //        {
-    //            AudioSource[] audioSources = FindObjectsOfType<AudioSource>();
-    //            foreach (AudioSource source in audioSources)
-    //            {
-    //                source.Stop();
-    //            }
-    //            Time.timeScale = 0f;
-    //        }
-    //    }
-    //}
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
@@ -72,8 +63,6 @@ public class PlayerMovement : MonoBehaviour
         {
             float playerY = collision.otherCollider.transform.position.y;
             float tetrominoY = collision.gameObject.transform.position.y;
-            float playerX = collision.otherCollider.transform.position.x;
-            float tetrominoX = collision.gameObject.transform.position.x;
 
             Collider2D playerCollider = collision.otherCollider;
             Collider2D tetrominoCollider = collision.collider;
@@ -89,9 +78,6 @@ public class PlayerMovement : MonoBehaviour
             }
         }
     }
-
-
-
     private float GetMovementInput()
     {
         if (Input.GetKey(moveLeftKey))
@@ -115,11 +101,17 @@ public class PlayerMovement : MonoBehaviour
         // Obliczanie docelowego k¹ta obrotu
         if (direction > 0)
         {
+            state = MovementState.walking;
             targetRotation = 180f; // Kierunek w prawo (0 stopni)
         }
         else if (direction < 0)
         {
+            state = MovementState.walking;
             targetRotation = 0f; // Kierunek w lewo (180 stopni)
+        }
+        else
+        {
+            state = MovementState.idle;
         }
 
         // P³ynne obracanie postaci
@@ -129,10 +121,29 @@ public class PlayerMovement : MonoBehaviour
 
     private void Jump()
     {
+        //GroundCheck
+        onGround = Physics2D.IsTouchingLayers(playerCollider, groundLayer);
+        if (onGround)
+        {
+            canJump = true;
+        }
+        else
+        {
+            canJump = false;
+            state = MovementState.jumping;
+        }
+
         // Skakanie
         if (canJump && Input.GetKeyDown(jumpKey))
         {
             rb.velocity = new Vector2(rb.velocity.x, jumpForce);
+            canDoubleJump = true;
+        }
+        else if (canDoubleJump && Input.GetKeyDown(jumpKey) && currentStamina >= 30f)
+        {
+            rb.velocity = new Vector2(rb.velocity.x, jumpForce);
+            canDoubleJump = false;
+            currentStamina -= 30f;
         }
 
         // Modyfikacja opadania
@@ -144,5 +155,12 @@ public class PlayerMovement : MonoBehaviour
         {
             rb.velocity += Vector2.up * Physics2D.gravity.y * lowJumpMultiplier * Time.deltaTime;
         }
+    }
+
+    void OnGUI()
+    {
+        GUIStyle style = new GUIStyle(GUI.skin.box);
+        style.fontSize = 60;
+        GUI.Box(new Rect(staminaX, 0, 500, 100), "Stamina: " + (int)currentStamina, style);
     }
 }
