@@ -3,7 +3,6 @@ using UnityEngine;
 public class CameraController : MonoBehaviour
 {
     public Transform cameraTransform;
-    public Transform targetElement;
     public GameObject cameraTrigger;
     public GameObject tetrisManager;
     public string tetrominoTag = "Tetromino";

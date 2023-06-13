@@ -15,8 +15,22 @@ public class PlayerCombat : MonoBehaviour
 
     public float attackRate = 2f;
     float nextAttackTime = 0f;
+    public AudioClip soundClip;
+    private AudioSource audioSource;
+
+    public AudioClip soundClip2;
+    private AudioSource audioSource2;
 
     [SerializeField] private KeyCode attackKey;
+
+    private void Start()
+    {
+        audioSource = gameObject.AddComponent<AudioSource>();
+        audioSource.clip = soundClip;
+
+        audioSource2 = gameObject.AddComponent<AudioSource>();
+        audioSource2.clip = soundClip2;
+    }
 
     // Update is called once per frame
     void Update()
@@ -41,10 +55,17 @@ public class PlayerCombat : MonoBehaviour
         // bedzie tylko jeden ale zrobilem tablice bo tak bylo w poradniku
         Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(attackPoint.position, attackRange, enemyLayer);
 
-        foreach(Collider2D enemy in hitEnemies)
+        if(hitEnemies.Length < 1)
         {
+            audioSource2.PlayOneShot(soundClip2);
+        }
+        
+        foreach (Collider2D enemy in hitEnemies)
+        {
+            
             if (!enemy.GetComponent<ObjectStunning>().isStunned)
             {
+                audioSource.PlayOneShot(soundClip);
                 Debug.Log("We hit " + enemy.name);
                 enemy.GetComponent<ObjectHealth>().TakeDamage(attackDamage);
                 enemy.GetComponent<ObjectStunning>().stun();

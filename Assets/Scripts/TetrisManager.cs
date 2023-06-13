@@ -35,8 +35,8 @@ public class TetrisManager : MonoBehaviour
             spawnTimer = spawnInterval;
             SpawnTetromino(null);
         }
-
         CheckSleepState();
+        
 
     }
 
@@ -52,6 +52,7 @@ public class TetrisManager : MonoBehaviour
             {
                 tetromino.tag = "StoppedTetromino";
                 tetrominoRigidbody.constraints = RigidbodyConstraints2D.FreezePositionX | RigidbodyConstraints2D.FreezePositionY | RigidbodyConstraints2D.FreezeRotation;
+                
                 //soundEffect.Play();
             }
         }

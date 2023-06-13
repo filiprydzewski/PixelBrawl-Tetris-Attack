@@ -22,10 +22,10 @@ public class PlayerMovement : MonoBehaviour
     private float rotationSpeed = 10f; // Pr�dko�� obracania
     private float targetRotation = 0f; // Docelowy k�t obrotu
 
+    public AudioSource soundEffect;
     private enum MovementState { idle, walking, jumping, doubleJump };
     private Animator anim;
     MovementState state;
-    public AudioSource soundEffect;
 
     [SerializeField] private KeyCode moveLeftKey = KeyCode.A;
     [SerializeField] private KeyCode moveRightKey = KeyCode.D;
@@ -74,7 +74,6 @@ public class PlayerMovement : MonoBehaviour
             if (playerY < tetrominoY - 0.001f && playerCollider.bounds.Intersects(tetrominoCollider.bounds))
             {
                 AudioSource[] audioSources = FindObjectsOfType<AudioSource>();
-                
                 foreach (AudioSource source in audioSources)
                 {
                     soundEffect.Play();
