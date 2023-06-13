@@ -19,8 +19,8 @@ public class PlayerMovement : MonoBehaviour
     private float lowJumpMultiplier = 5f;
     private bool canJump = true;
     private float jumpForce = 11f;
-    private float rotationSpeed = 10f; // Prêdkoœæ obracania
-    private float targetRotation = 0f; // Docelowy k¹t obrotu
+    private float rotationSpeed = 10f; // Prï¿½dkoï¿½ï¿½ obracania
+    private float targetRotation = 0f; // Docelowy kï¿½t obrotu
 
     private enum MovementState { idle, walking, jumping, doubleJump };
     private Animator anim;
@@ -45,13 +45,16 @@ public class PlayerMovement : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        Move(GetMovementInput());
-        Jump();
-
-        if (currentStamina < 100f)
+        if (!gameObject.GetComponent<ObjectStunning>().isStunned)
         {
-            currentStamina += staminaRegenSpeed * Time.deltaTime;
-            currentStamina = Mathf.Clamp(currentStamina, 0f, 100f);
+            Move(GetMovementInput());
+            Jump();
+
+            if (currentStamina < 100f)
+            {
+                currentStamina += staminaRegenSpeed * Time.deltaTime;
+                currentStamina = Mathf.Clamp(currentStamina, 0f, 100f);
+            }
         }
 
         anim.SetInteger("state", (int)state);
@@ -98,7 +101,7 @@ public class PlayerMovement : MonoBehaviour
     {
         rb.velocity = new Vector2(direction * moveSpeed, rb.velocity.y);
 
-        // Obliczanie docelowego k¹ta obrotu
+        // Obliczanie docelowego kï¿½ta obrotu
         if (direction > 0)
         {
             state = MovementState.walking;
@@ -114,7 +117,7 @@ public class PlayerMovement : MonoBehaviour
             state = MovementState.idle;
         }
 
-        // P³ynne obracanie postaci
+        // Pï¿½ynne obracanie postaci
         float currentRotation = Mathf.LerpAngle(transform.eulerAngles.y, targetRotation, rotationSpeed * Time.deltaTime);
         transform.eulerAngles = new Vector3(transform.eulerAngles.x, currentRotation, transform.eulerAngles.z);
     }
