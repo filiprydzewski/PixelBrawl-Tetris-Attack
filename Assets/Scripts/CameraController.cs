@@ -36,7 +36,6 @@ public class CameraController : MonoBehaviour
         if (isMovingCamera)
         {
             MoveCamera();
-            MoveTargetElement();
             MoveCameraTrigger();
             MoveTetrisManager();
             MoveBackground();
@@ -82,12 +81,6 @@ public class CameraController : MonoBehaviour
         {
             isMovingCamera = false;
         }
-    }
-
-    private void MoveTargetElement()
-    {
-        Vector3 targetElementPosition = targetElement.position + Vector3.up * cameraSpeed * Time.deltaTime;
-        targetElement.position = targetElementPosition;
     }
 
     private void MoveCameraTrigger()

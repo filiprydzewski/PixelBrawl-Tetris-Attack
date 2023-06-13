@@ -25,6 +25,7 @@ public class PlayerMovement : MonoBehaviour
     private enum MovementState { idle, walking, jumping, doubleJump };
     private Animator anim;
     MovementState state;
+    public AudioSource soundEffect;
 
     [SerializeField] private KeyCode moveLeftKey = KeyCode.A;
     [SerializeField] private KeyCode moveRightKey = KeyCode.D;
@@ -70,8 +71,10 @@ public class PlayerMovement : MonoBehaviour
             if (playerY < tetrominoY - 0.001f && playerCollider.bounds.Intersects(tetrominoCollider.bounds))
             {
                 AudioSource[] audioSources = FindObjectsOfType<AudioSource>();
+                
                 foreach (AudioSource source in audioSources)
                 {
+                    soundEffect.Play();
                     source.Stop();
                 }
                 Time.timeScale = 0f;
