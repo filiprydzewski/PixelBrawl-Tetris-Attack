@@ -52,7 +52,7 @@ public class TetrisManager : MonoBehaviour
             {
                 tetromino.tag = "StoppedTetromino";
                 tetrominoRigidbody.constraints = RigidbodyConstraints2D.FreezePositionX | RigidbodyConstraints2D.FreezePositionY | RigidbodyConstraints2D.FreezeRotation;
-                
+                tetrominoRigidbody.sleepMode = RigidbodySleepMode2D.StartAsleep;
                 //soundEffect.Play();
             }
         }

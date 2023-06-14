@@ -7,7 +7,7 @@ public class CameraController : MonoBehaviour
     public GameObject tetrisManager;
     public string tetrominoTag = "Tetromino";
 
-    private float cameraSpeed = 5f;
+    private float cameraSpeed = 2f;
     private bool isMovingCamera;
     private Vector3 initialCameraPosition;
     private Vector3 targetCameraPosition;
