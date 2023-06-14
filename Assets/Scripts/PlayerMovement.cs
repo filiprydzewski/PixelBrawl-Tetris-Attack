@@ -73,16 +73,38 @@ public class PlayerMovement : MonoBehaviour
 
             if (playerY < tetrominoY - 0.001f && playerCollider.bounds.Intersects(tetrominoCollider.bounds))
             {
-                AudioSource[] audioSources = FindObjectsOfType<AudioSource>();
-                foreach (AudioSource source in audioSources)
+                bool isPlayerTouchingBelow = IsPlayerTouchingBelow(playerCollider);
+                bool isPlayerTouchingAbove = IsPlayerTouchingAbove(playerCollider);
+
+                if (isPlayerTouchingBelow && isPlayerTouchingAbove)
                 {
-                    soundEffect.Play();
-                    source.Stop();
+                    AudioSource[] audioSources = FindObjectsOfType<AudioSource>();
+                    foreach (AudioSource source in audioSources)
+                    {
+                        soundEffect.Play();
+                        source.Stop();
+                    }
+                    Time.timeScale = 0f;
                 }
-                Time.timeScale = 0f;
             }
         }
     }
+
+    private bool IsPlayerTouchingBelow(Collider2D playerCollider)
+    {
+        Vector2 playerBottomPoint = new Vector2(playerCollider.bounds.center.x, playerCollider.bounds.min.y - 0.001f);
+        RaycastHit2D hit = Physics2D.Raycast(playerBottomPoint, Vector2.down, 0.01f);
+        return hit.collider != null;
+    }
+
+    private bool IsPlayerTouchingAbove(Collider2D playerCollider)
+    {
+        Vector2 playerTopPoint = new Vector2(playerCollider.bounds.center.x, playerCollider.bounds.max.y + 0.001f);
+        RaycastHit2D hit = Physics2D.Raycast(playerTopPoint, Vector2.up, 0.01f);
+        return hit.collider != null;
+    }
+
+
     private float GetMovementInput()
     {
         if (Input.GetKey(moveLeftKey))
