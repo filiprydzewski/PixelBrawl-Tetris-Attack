@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class ObjectStunning : MonoBehaviour
 {
-    public int stunDuration = 3;
+    public int stunDuration = 2;
     public bool isStunned = false;
 
     public Animator animator;

@@ -11,9 +11,9 @@ public class PlayerCombat : MonoBehaviour
     public LayerMask enemyLayer;
 
     public float attackRange = 0.5f;
-    public int attackDamage = 10;
+    public int attackDamage = 20;
 
-    public float attackRate = 2f;
+    public float attackRate = 1f;
     float nextAttackTime = 0f;
     public AudioClip soundClip;
     private AudioSource audioSource;

@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -26,6 +27,7 @@ public class PlayerMovement : MonoBehaviour
     private enum MovementState { idle, walking, jumping, doubleJump };
     private Animator anim;
     MovementState state;
+    private bool reachedYThreshold = false;
 
     [SerializeField] private KeyCode moveLeftKey = KeyCode.A;
     [SerializeField] private KeyCode moveRightKey = KeyCode.D;
@@ -59,6 +61,31 @@ public class PlayerMovement : MonoBehaviour
         }
 
         anim.SetInteger("state", (int)state);
+
+    }
+
+        private void LateUpdate()
+    {
+        // Sprawdź, czy obiekt jest na płaszczyźnie Y o 15 jednostek niżej niż kamera
+        if (transform.position.y <= Camera.main.transform.position.y - 7.5f && !reachedYThreshold)
+        {
+            reachedYThreshold = true;
+            OnReachedYThreshold();
+        }
+    }
+
+    private void OnReachedYThreshold()
+    {
+         AudioSource[] audioSources = FindObjectsOfType<AudioSource>();
+                    foreach (AudioSource source in audioSources)
+                    {
+                        soundEffect.Play();
+                        source.Stop();
+                        
+
+                    }
+                    Time.timeScale = 0f;
+                    StartCoroutine(WaitAndLoadNextScene(5f));
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
@@ -78,17 +105,28 @@ public class PlayerMovement : MonoBehaviour
 
                 if (isPlayerTouchingBelow && isPlayerTouchingAbove)
                 {
+                    
                     AudioSource[] audioSources = FindObjectsOfType<AudioSource>();
                     foreach (AudioSource source in audioSources)
                     {
                         soundEffect.Play();
                         source.Stop();
+                        
+
                     }
                     Time.timeScale = 0f;
+                    StartCoroutine(WaitAndLoadNextScene(5f));
                 }
             }
         }
     }
+
+IEnumerator WaitAndLoadNextScene(float waitTime)
+{
+    yield return new WaitForSecondsRealtime(waitTime);
+    SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+    Time.timeScale = 1f;
+}
 
     private bool IsPlayerTouchingBelow(Collider2D playerCollider)
     {
