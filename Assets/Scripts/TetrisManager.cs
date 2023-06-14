@@ -23,7 +23,7 @@ public class TetrisManager : MonoBehaviour
 
         Rigidbody2D tetrominoRigidbody = currentTetromino.GetComponent<Rigidbody2D>();
         tetrominoRigidbody.sleepMode = RigidbodySleepMode2D.StartAwake;
-        tetrominoRigidbody.velocity = new Vector2(1f, 0f); // Dostosuj wartoœci wektora prêdkoœci do swoich potrzeb
+        tetrominoRigidbody.velocity = new Vector2(0f, 1f); // Dostosuj wartoœci wektora prêdkoœci do swoich potrzeb
     }
 
 
@@ -36,7 +36,7 @@ public class TetrisManager : MonoBehaviour
             SpawnTetromino(null);
         }
         CheckSleepState();
-        
+        CheckSleepStateUnderScreen();
 
     }
 
@@ -53,10 +53,37 @@ public class TetrisManager : MonoBehaviour
                 tetromino.tag = "StoppedTetromino";
                 tetrominoRigidbody.constraints = RigidbodyConstraints2D.FreezePositionX | RigidbodyConstraints2D.FreezePositionY | RigidbodyConstraints2D.FreezeRotation;
                 tetrominoRigidbody.sleepMode = RigidbodySleepMode2D.StartAsleep;
+                tetrominoRigidbody.bodyType = RigidbodyType2D.Static;
                 //soundEffect.Play();
             }
         }
     }
+
+    private void CheckSleepStateUnderScreen()
+    {
+        GameObject[] tetrominos = GameObject.FindGameObjectsWithTag("Tetromino");
+
+        Camera mainCamera = Camera.main;
+        float screenBottom = mainCamera.ViewportToWorldPoint(new Vector3(0, 0, mainCamera.nearClipPlane)).y - 2.4f;
+
+        foreach (GameObject tetromino in tetrominos)
+        {
+            if (tetromino.transform.position.y < screenBottom)
+            {
+                Rigidbody2D tetrominoRigidbody = tetromino.GetComponent<Rigidbody2D>();
+
+                if (tetrominoRigidbody != null && !tetrominoRigidbody.IsSleeping())
+                {
+                    //soundEffect.Play();
+                    tetromino.tag = "StoppedTetromino";
+                    tetrominoRigidbody.constraints = RigidbodyConstraints2D.FreezePositionX | RigidbodyConstraints2D.FreezePositionY | RigidbodyConstraints2D.FreezeRotation;
+                    tetrominoRigidbody.sleepMode = RigidbodySleepMode2D.StartAsleep;
+                    tetrominoRigidbody.bodyType = RigidbodyType2D.Static;
+                }
+            }
+        }
+    }
+
 
 
     private void SpawnTetromino(float? x)
@@ -75,7 +102,7 @@ public class TetrisManager : MonoBehaviour
             // Losowy wybór rotacji
             var rotation = UnityEngine.Random.Range(0, 4) * 90;
             int rotationIndex = UnityEngine.Random.Range(0, rotation) * 90;
-            currentTetromino.transform.rotation = Quaternion.Euler(new Vector3(spawnPoint.position.x, spawnPoint.position.y, rotationIndex));
+            currentTetromino.transform.rotation = Quaternion.Euler(new Vector3(0, 0, rotationIndex));
 
             DoubleBlockTrigger(xSpawnPoint);
 
@@ -86,16 +113,16 @@ public class TetrisManager : MonoBehaviour
             int randomX = UnityEngine.Random.Range(minX, maxX);
             var xSpawnPoint = randomX * (float)0.8;
 
-            if (xSpawnPoint - 1.0f < x && x < xSpawnPoint + 1.0f)
+            if (xSpawnPoint - 1.6f < x && x < xSpawnPoint + 1.6f)
             {
-                float randomNumber = UnityEngine.Random.Range(2f, 4f);
-                if (xSpawnPoint - 1.0f < x)
+                float randomNumber = UnityEngine.Random.Range(4f, 8f);
+                if (x - 1.6f < xSpawnPoint)
                 {
-                    xSpawnPoint += 1.6f * randomNumber;
+                    xSpawnPoint = 1.6f * randomNumber;
                 }
-                else if (x < xSpawnPoint + 1.0f)
+                else if (xSpawnPoint <  + 1.6f)
                 {
-                    xSpawnPoint -= 1.6f * randomNumber;
+                    xSpawnPoint = 1.6f * randomNumber;
                 }
             }
 
@@ -105,16 +132,13 @@ public class TetrisManager : MonoBehaviour
             // Losowy wybór rotacji
             var rotation = UnityEngine.Random.Range(0, 4) * 90;
             int rotationIndex = UnityEngine.Random.Range(0, rotation) * 90;
-            currentTetromino.transform.rotation = Quaternion.Euler(new Vector3(spawnPoint.position.x, spawnPoint.position.y, rotationIndex));
+            currentTetromino.transform.rotation = Quaternion.Euler(new Vector3(0, 0, rotationIndex));
 
             currentTetromino.tag = "Tetromino";
         }
     }
 
-    private void MoveTetromino(Vector3 direction)
-    {
-        currentTetromino.transform.position += direction;
-    }
+
 
     private void RotateTetromino()
     {
@@ -125,7 +149,7 @@ public class TetrisManager : MonoBehaviour
     private void DoubleBlockTrigger(float x)
     {
         int randomNumber = UnityEngine.Random.Range(0, 100);
-        if (randomNumber > 85)
+        if (randomNumber > 90)
         {
             SpawnTetromino(x);
         }
