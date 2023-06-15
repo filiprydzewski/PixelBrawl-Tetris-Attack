@@ -225,7 +225,9 @@ IEnumerator WaitAndLoadNextScene(float waitTime)
     void OnGUI()
     {
         GUIStyle style = new GUIStyle(GUI.skin.box);
-        style.fontSize = 60;
-        GUI.Box(new Rect(staminaX, 0, 500, 100), "Stamina: " + (int)currentStamina, style);
+        style.fontSize = 30;
+        style.normal.textColor = Color.white; // Ustawiono kolor tekstu na biały
+        style.fontStyle = FontStyle.Bold; // Wytłuszczenie tekstu
+        GUI.Box(new Rect(staminaX, 10, Screen.width * 0.5f, 50), "Stamina: " + (int)currentStamina, style);
     }
 }

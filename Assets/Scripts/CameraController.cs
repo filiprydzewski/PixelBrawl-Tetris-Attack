@@ -12,13 +12,18 @@ public class CameraController : MonoBehaviour
     private Vector3 initialCameraPosition;
     private Vector3 targetCameraPosition;
     private Vector3 initialBackgroundPosition;
-    public Transform background;
 
+
+    public Transform bg1;
+    public Transform bg2;
+
+    private float size;
 
     private void Start()
     {
         initialCameraPosition = cameraTransform.position;
-        initialBackgroundPosition = background.position;
+
+        size = bg1.GetComponent<BoxCollider2D>().size.y;
     }
 
     private void Update()
@@ -37,9 +42,22 @@ public class CameraController : MonoBehaviour
             MoveCamera();
             MoveCameraTrigger();
             MoveTetrisManager();
-            MoveBackground();
         }
+
+        if(cameraTransform.position.y >= bg2.position.y) {
+            bg1.position = new Vector3(bg1.position.x, bg2.position.y+size, bg1.position.z);
+            SwitchBG();
+        }
+        
     }
+
+
+    private void SwitchBG() {
+        Transform temp =bg1;
+        bg1 = bg2;
+        bg2 = temp;
+    }
+
 
     private bool IsTetrominoTouchingTrigger()
     {
@@ -94,9 +112,4 @@ public class CameraController : MonoBehaviour
         tetrisManager.transform.position = tetrisManagerPosition;
     }
 
-    private void MoveBackground()
-    {
-        Vector3 backgroundPosition = initialBackgroundPosition + (cameraTransform.position - initialCameraPosition);
-        background.position = backgroundPosition;
-    }
 }

@@ -42,6 +42,12 @@ TagManager:
   - 
   - 
   m_SortingLayers:
+  - name: BG
+    uniqueID: 154573667
+    locked: 0
+  - name: clouds
+    uniqueID: 3152525075
+    locked: 0
   - name: Default
     uniqueID: 0
     locked: 0
